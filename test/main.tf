@@ -5,7 +5,6 @@ module "test1" {
 
   platform = "gcm"
 
-  //platform_credential = "AIzaSyCVnUDjY5TQ7IHLqjjOx_4KENv_4a3tdlY"
   platform_credential = "GCM"
 
   use_secret_manager = true

@@ -2,12 +2,9 @@
 
 [![Build Status](http://jenkins.services.dat.internal/buildStatus/icon?job=DevOps/Terraform/Modules/tf-module-sns-application/master)](http://jenkins.services.dat.internal/job/DevOps/job/Terraform/job/Modules/job/tf-module-sns-application/)
 
-Terraform module used to provision an IAM Role. Currently supports creating roles for the following uses:
+Terraform module use to configure SNS for User Notifications with a Mobile Application as a Subscriber (Mobile Push). Currently supports Google Cloud Messaging and Apple Push Notification Service.
 
-  - An IAM user in a different AWS account as the role
-  - A web service offered by AWS such as Amazon Elastic Compute Cloud (Amazon EC2)
-
-Official AWS documentation: https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles.html
+Official AWS documentation: https://docs.aws.amazon.com/sns/latest/dg/sns-mobile-application-as-subscriber.html
 
 ## Requirements
 - - - -
@@ -15,8 +12,6 @@ Official AWS documentation: https://docs.aws.amazon.com/IAM/latest/UserGuide/id_
 This module requires:
 
    -  [AWS Provider](https://github.com/terraform-providers/terraform-provider-aws) `>= 1.17.0`
-   -  [Template Provider](https://github.com/terraform-providers/terraform-provider-template) `>= 1.0.0`
-   -  [Random Provider](https://github.com/terraform-providers/terraform-provider-random) `>= 2.0.0`
 
 ### Inputs
 - - - -
@@ -25,15 +20,12 @@ This module takes the following inputs:
 
   Name          | Description   | Type          | Default
   ------------- | ------------- | ------------- | -------------
-  name          | Name of the role and policies  | String |
-  name_prefix   | Added prefix to role name (useful if you every plan on changing the role name)  | Boolean       | true
-  type          | Role trust entity (valid values: service, account) | String |
-  service       | AWS service this role will be used by (required when type service) | String | ""
-  account_id    | AWS Account this role will be used by (required when type account) | String | ""
-  account_user  | AWS Account user this role will be used by (only required for type account) | String | root
-  external_id   | When set, enable external ID (required when type account) | String | ""
-  create_policy | Map containing details of the policy to create and attach to role | Map | {}
-  existing_policy | List of existing policies to attach to role | List | []
+  name          | Name of the SNS application  | String |
+  platform      | Either APNS or GCM | String |
+  platform_credential | See https://docs.aws.amazon.com/sns/latest/dg/mobile-push-send-register.html | String |
+  platform_principal | See https://docs.aws.amazon.com/sns/latest/dg/mobile-push-send-register.html | String |
+  use_secret_manager | If true, the values of credential and principal are secrets stored in AWS Secrets manager | Boolean | false
+  apns_sandbox | Use SANDBOX for APNS | Boolean | true
 
 ### Ouputs
 - - - -
@@ -42,69 +34,45 @@ This module exposes the following outputs:
 
   Name          | Description   | Type
   ------------- | ------------- | -------------
-  role_arn | ARN of the created role  | String
-  instance_profile_arn | ARN of the created instance profile (valid when type service and service ec2) | String
-  instance_profile_name | Name of the created instance profile (valid when type service and service ec2) | String
-
 
 ## Usage
 - - - -
 
-Create IAM role with trust entitty to another AWS Account.
+Apple Push Notification Service (APNS)
 
 ```hcl
 
-module "iam_role_account" {
-  source = "git::ssh://git@bitbucket.org/dat/tf-module-am-role.git?ref=master"
 
-  name = "example"
-  /* role name will be example with no added prefix */
-  name_prefix = false
+module "apns" {
+  source = "git::ssh://git@bitbucket.org/dat/tf-module-sns-application.git?ref=master"
 
-  type = "account"
+  name = "apns"
 
-  /* type = account so we must specify the account_id and possibly external_id */
-  account_id  = "755621335444"
-  external_id = "123456"
+  platform = "apns"
 
-  /* example_policy.tpl must exist in the current working directory */
-  create_policy {
-    template = "example_policy.tpl"
-    key      = "key1,key2"
-    value    = "value1,value2"
-  }
+  platform_credential = "APNS"
+  platform_principal  = "APNS_certificate"
 
-  /* required to allow create_policy to include interpolation */
-  create_policy_count = 1
-
-  existing_policy = [ "AdministratoryAccess" ]
+  use_secret_manager = true
 }
 
 ```
 
-Create IAM role to be used by AWS EC2 service.
+Google Cloud Messaging (GCM)
 
 ```hcl
 
-module "iam_role_service" {
-  source = "git::ssh://git@bitbucket.org/dat/tf-module-am-role.git?ref=master"
 
-  name = "example"
-  /* role name will be example with no added prefix */
-  name_prefix = false
+module "gcm" {
+  source = "git::ssh://git@bitbucket.org/dat/tf-module-sns-application.git?ref=master"
 
-  type    = "service"
-  service = "ec2"
+  name = "gcm"
 
-  /* example_policy.tpl must exist in the current working directory */
-  create_policy {
-    template = "example_policy.tpl"
-    key      = "key1,key2"
-    value    = "value1,value2"
-  }
+  platform = "gcm"
 
-  /* required to allow create_policy to include interpolation */
-  create_policy_count = 1
+  platform_credential = "GCM"
+
+  use_secret_manager = true
 }
 
 ```
