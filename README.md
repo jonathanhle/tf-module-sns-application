@@ -34,6 +34,8 @@ This module exposes the following outputs:
 
   Name          | Description   | Type
   ------------- | ------------- | -------------
+  sns_application_arn | ARN of the SNS platform application | String
+  sns_application_id | ARN of the SNS platform application | String
 
 ## Usage
 - - - -
