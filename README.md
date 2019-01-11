@@ -1,6 +1,6 @@
 ## Amazon Web Services SNS Application
 
-[![Build Status](http://jenkins.services.dat.internal/buildStatus/icon?job=DevOps/Terraform/Modules/tf-module-sns-application/master)](http://jenkins.services.dat.internal/job/DevOps/job/Terraform/job/Modules/job/tf-module-sns-application/)
+[![Build Status](http://jenkins.dat.com/buildStatus/icon?job=DevOps/Terraform/Modules/tf-module-sns-application/master)](http://jenkins.dat.com/job/DevOps/job/Terraform/job/Modules/job/tf-module-sns-application/)
 
 Terraform module use to configure SNS for User Notifications with a Mobile Application as a Subscriber (Mobile Push). Currently supports Google Cloud Messaging and Apple Push Notification Service.
 
@@ -20,12 +20,12 @@ This module takes the following inputs:
 
   Name          | Description   | Type          | Default
   ------------- | ------------- | ------------- | -------------
-  name          | Name of the SNS application  | String |
-  platform      | Either APNS or GCM | String |
-  platform_credential | See https://docs.aws.amazon.com/sns/latest/dg/mobile-push-send-register.html | String |
-  platform_principal | See https://docs.aws.amazon.com/sns/latest/dg/mobile-push-send-register.html | String |
-  use_secret_manager | If true, the values of credential and principal are secrets stored in AWS Secrets manager | Boolean | false
-  apns_sandbox | Use SANDBOX for APNS | Boolean | true
+  `name`          | Name of the SNS application.  | string | -
+  `platform`      | Either APNS or GCM. | string | -
+  `platform_credential` | See https://docs.aws.amazon.com/sns/latest/dg/mobile-push-send-register.html. | string | -
+  `platform_principal` | See https://docs.aws.amazon.com/sns/latest/dg/mobile-push-send-register.html. | string | -
+  `use_secret_manager` | If true, the values of credential and principal are secrets stored in AWS Secrets manager. | boolean | `false`
+  `apns_sandbox` | Use SANDBOX for APNS | boolean | `true`
 
 ### Ouputs
 - - - -
@@ -34,8 +34,8 @@ This module exposes the following outputs:
 
   Name          | Description   | Type
   ------------- | ------------- | -------------
-  sns_application_arn | ARN of the SNS platform application | String
-  sns_application_id | ARN of the SNS platform application | String
+  `sns_application_arn` | ARN of the SNS platform application | string
+  `sns_application_id` | ARN of the SNS platform application | string
 
 ## Usage
 - - - -
